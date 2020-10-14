@@ -1,9 +1,13 @@
 package com.example.myapplication.api;
 
+import java.io.Serializable;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-public class User {
+@AllArgsConstructor
+public class User implements Serializable {
     private int id;
     private String nick;
     private String password;

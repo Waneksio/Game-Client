@@ -17,7 +17,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SaveScoreActivity"></activity>
         <activity android:name=".ShowRecordsActivity" />
     </application>
 

@@ -1,44 +1,67 @@
 package com.example.myapplication;
 
-import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.ArrayList;
+import com.example.myapplication.api.DataController;
+import com.example.myapplication.api.User;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+
+import lombok.SneakyThrows;
 
 public class ShowRecordsActivity extends AppCompatActivity {
 
-    private static final String TAG = "ListDataActivity";
-
-    DatabaseHelper mDatabaseHelper;
-
+    private DataController dataController = new DataController();
     private ListView mListView;
 
+    @SneakyThrows
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.list_layout);
+
         mListView = (ListView) findViewById(R.id.listView);
-        mDatabaseHelper = new DatabaseHelper(this);
-        
-        pulateListView();
+
+        Button finishButton = findViewById(R.id.finishbutton);
+        finishButton.setOnClickListener(event -> {
+            finish();
+        });
+
+        populateListView();
     }
 
-    private void pulateListView() {
-        Log.d(TAG, "populateListView: Displaying data in the ListView");
+    private void populateListView() throws
+                                    InterruptedException {
+        AtomicReference<List<User>> listData = new AtomicReference<>();
 
-        Cursor data = mDatabaseHelper.getData();
-        ArrayList<String> listData = new ArrayList<>();
-        while(data.moveToNext()) {
-            listData.add(data.getString(1) + " " + data.getString(0));
-        }
-        ListAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listData);
+        Thread myThread = new Thread(() -> {
+            try {
+                listData.set(dataController.getScores());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        myThread.start();
+        myThread.join();
+
+        ListAdapter adapter = new ArrayAdapter<>(this,
+                                                 android.R.layout.simple_list_item_1,
+                                                 listData.get()
+                                                         .stream()
+                                                         .map(o -> o.getNick() + ": " + o.getScore())
+                                                         .collect(Collectors.toList()));
         mListView.setAdapter(adapter);
     }
 }

@@ -5,7 +5,13 @@
     android:layout_height="match_parent">
 
     <ListView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/listView"/>
+            android:id="@+id/listView"
+            android:layout_width="369dp"
+            android:layout_height="479dp" />
+
+    <Button
+            android:id="@+id/finishbutton"
+            android:layout_width="match_parent"
+            android:layout_height="51dp"
+            android:text="@string/new_game" />
 </LinearLayout>
